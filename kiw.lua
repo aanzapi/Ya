@@ -1,9 +1,7 @@
--- // Advanced GUI by AanZAPI (Final Update)
--- Bisa digeser, ada tombol close (toggle kecil tetap ada)
--- Fly controllable (analog untuk maju mundur, tombol naik/turun ditekan lama biar smooth)
--- Atur kecepatan fly
--- Teleport player list
--- Save & Auto Teleport Checkpoint (Page 2)
+-- // Advanced GUI by AanZAPI (Final Clean Version)
+-- Bisa digeser, toggle kecil juga bisa dipindah
+-- Fly controllable, atur speed, teleport player
+-- Save, Auto Teleport, Delete Checkpoint
 
 -- Services
 local Players = game:GetService("Players")
@@ -17,7 +15,7 @@ ScreenGui.Name = "AanGUI"
 ScreenGui.Parent = LP:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- Toggle Button
+-- Toggle Button (draggable)
 local ToggleBtn = Instance.new("TextButton")
 ToggleBtn.Size = UDim2.new(0,40,0,40)
 ToggleBtn.Position = UDim2.new(0,10,0.5,-20)
@@ -27,6 +25,8 @@ ToggleBtn.BackgroundColor3 = Color3.fromRGB(50,50,50)
 ToggleBtn.TextColor3 = Color3.fromRGB(255,255,255)
 ToggleBtn.Parent = ScreenGui
 Instance.new("UICorner",ToggleBtn).CornerRadius = UDim.new(0,10)
+ToggleBtn.Active = true
+ToggleBtn.Draggable = true -- bisa dipindah
 
 -- Main Frame
 local MainFrame = Instance.new("Frame")
@@ -83,7 +83,7 @@ Page2.Visible = false
 
 local NextBtn = Instance.new("TextButton")
 NextBtn.Size = UDim2.new(0, 50, 0, 25)
-NextBtn.Position = UDim2.new(1,-55,0,2) -- pindah ke atas
+NextBtn.Position = UDim2.new(1,-55,0,2)
 NextBtn.Text = "➡️"
 NextBtn.TextColor3 = Color3.fromRGB(255,255,255)
 NextBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
@@ -92,7 +92,7 @@ Instance.new("UICorner", NextBtn).CornerRadius = UDim.new(0,6)
 
 local BackBtn = Instance.new("TextButton")
 BackBtn.Size = UDim2.new(0, 50, 0, 25)
-BackBtn.Position = UDim2.new(0,5,0,2) -- pindah ke atas
+BackBtn.Position = UDim2.new(0,5,0,2)
 BackBtn.Text = "⬅️"
 BackBtn.TextColor3 = Color3.fromRGB(255,255,255)
 BackBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
@@ -233,7 +233,7 @@ CPList.BackgroundColor3 = Color3.fromRGB(30,30,30)
 CPList.ScrollBarThickness = 4
 Instance.new("UICorner", CPList).CornerRadius = UDim.new(0,6)
 
--- CHECKPOINT SYSTEM
+-- === CHECKPOINT SYSTEM ===
 local checkpoints = {}
 local autoTele = false
 
@@ -361,4 +361,10 @@ local function refreshPlayers()
     ListFrame.CanvasSize = UDim2.new(0,0,0,y)
 end
 Players.PlayerAdded:Connect(refreshPlayers)
-Players.PlayerRemoving:Connect(refresh
+Players.PlayerRemoving:Connect(refreshPlayers)
+refreshPlayers()
+
+DropDown.MouseButton1Click:Connect(function()
+    ListFrame.Visible = not ListFrame.Visible
+end)
+``
