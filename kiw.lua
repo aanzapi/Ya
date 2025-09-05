@@ -1,13 +1,9 @@
--- // Advanced GUI by AanZAPI (No Toggle Button)
--- Bisa digeser, ada tombol close
--- Fly controllable + speed
--- Teleport player
--- Checkpoint system (save/delete/auto teleport)
--- Multi-page dengan tombol Next/Prev di atas
+-- // Advanced GUI by AanZAPI (16:9 + Fly Control Update)
 
 -- Services
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
+local UIS = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 -- ScreenGui
@@ -16,24 +12,40 @@ ScreenGui.Name = "AanGUI"
 ScreenGui.Parent = LP:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- Main Frame
+-- Toggle Button
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Size = UDim2.new(0,40,0,40)
+ToggleBtn.Position = UDim2.new(0,10,0.5,-20)
+ToggleBtn.Text = "≡"
+ToggleBtn.TextSize = 22
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(50,50,50)
+ToggleBtn.TextColor3 = Color3.fromRGB(255,255,255)
+ToggleBtn.Parent = ScreenGui
+Instance.new("UICorner",ToggleBtn).CornerRadius = UDim.new(0,10)
+
+-- Main Frame (16:9)
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 250, 0, 400)
-MainFrame.Position = UDim2.new(0.3, 0, 0.3, 0)
-MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+MainFrame.Size = UDim2.new(0, 500, 0, 280)
+MainFrame.Position = UDim2.new(0.25, 0, 0.3, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 MainFrame.Active = true
 MainFrame.Draggable = true
+MainFrame.Visible = false
 MainFrame.Parent = ScreenGui
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
+
+ToggleBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
 
 -- Title Bar
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -60, 0, 30)
+Title.Size = UDim2.new(1, -40, 0, 30)
 Title.BackgroundTransparency = 1
 Title.Text = "🚀 AanZAPI GUI"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.SourceSansBold
-Title.TextSize = 18
+Title.TextSize = 20
 Title.Parent = MainFrame
 
 -- Close Button
@@ -50,225 +62,160 @@ CloseBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
 end)
 
--- Page Control (Top)
-local Page = 1
-local MaxPage = 2
+-------------------- FITUR (ATAS HORIZONTAL) --------------------
+local TopBar = Instance.new("Frame", MainFrame)
+TopBar.Size = UDim2.new(1, -10, 0, 50)
+TopBar.Position = UDim2.new(0,5,0,35)
+TopBar.BackgroundTransparency = 1
 
-local PrevBtn = Instance.new("TextButton")
-PrevBtn.Size = UDim2.new(0, 30, 0, 30)
-PrevBtn.Position = UDim2.new(0, 0, 0, 0)
-PrevBtn.Text = "<"
-PrevBtn.TextColor3 = Color3.fromRGB(255,255,255)
-PrevBtn.Font = Enum.Font.SourceSansBold
-PrevBtn.TextSize = 16
-PrevBtn.BackgroundTransparency = 1
-PrevBtn.Parent = MainFrame
+local UIList = Instance.new("UIListLayout", TopBar)
+UIList.FillDirection = Enum.FillDirection.Horizontal
+UIList.SortOrder = Enum.SortOrder.LayoutOrder
+UIList.Padding = UDim.new(0, 10)
 
-local NextBtn = Instance.new("TextButton")
-NextBtn.Size = UDim2.new(0, 30, 0, 30)
-NextBtn.Position = UDim2.new(0, 30, 0, 0)
-NextBtn.Text = ">"
-NextBtn.TextColor3 = Color3.fromRGB(255,255,255)
-NextBtn.Font = Enum.Font.SourceSansBold
-NextBtn.TextSize = 16
-NextBtn.BackgroundTransparency = 1
-NextBtn.Parent = MainFrame
-
--- Frame Pages
-local Page1 = Instance.new("Frame")
-Page1.Size = UDim2.new(1,0,1,-30)
-Page1.Position = UDim2.new(0,0,0,30)
-Page1.BackgroundTransparency = 1
-Page1.Parent = MainFrame
-
-local Page2 = Instance.new("Frame")
-Page2.Size = UDim2.new(1,0,1,-30)
-Page2.Position = UDim2.new(0,0,0,30)
-Page2.BackgroundTransparency = 1
-Page2.Visible = false
-Page2.Parent = MainFrame
-
--- Switch page
-local function updatePage()
-    Page1.Visible = (Page == 1)
-    Page2.Visible = (Page == 2)
-end
-PrevBtn.MouseButton1Click:Connect(function()
-    Page = math.max(1, Page - 1)
-    updatePage()
-end)
-NextBtn.MouseButton1Click:Connect(function()
-    Page = math.min(MaxPage, Page + 1)
-    updatePage()
-end)
-
--- ========================= PAGE 1: Fly + Teleport =========================
--- Fly Button
-local FlyBtn = Instance.new("TextButton")
-FlyBtn.Size = UDim2.new(0.9, 0, 0, 40)
-FlyBtn.Position = UDim2.new(0.05, 0, 0.05, 0)
+-- Fly Btn
+local FlyBtn = Instance.new("TextButton", TopBar)
+FlyBtn.Size = UDim2.new(0,120,1,0)
 FlyBtn.Text = "✈️ Fly: OFF"
-FlyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-FlyBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+FlyBtn.TextColor3 = Color3.fromRGB(255,255,255)
+FlyBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
 FlyBtn.Font = Enum.Font.SourceSansBold
 FlyBtn.TextSize = 18
-FlyBtn.Parent = Page1
-Instance.new("UICorner", FlyBtn).CornerRadius = UDim.new(0, 6)
+Instance.new("UICorner", FlyBtn).CornerRadius = UDim.new(0,8)
 
--- Teleport Player List
-local DropDown = Instance.new("TextButton")
-DropDown.Size = UDim2.new(0.9, 0, 0, 40)
-DropDown.Position = UDim2.new(0.05, 0, 0.65, 0)
-DropDown.Text = "👤 Teleport Menu"
-DropDown.TextColor3 = Color3.fromRGB(255, 255, 255)
-DropDown.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-DropDown.Font = Enum.Font.SourceSansBold
-DropDown.TextSize = 18
-DropDown.Parent = Page1
-Instance.new("UICorner", DropDown).CornerRadius = UDim.new(0, 6)
+-- Tombol Naik
+local UpBtn = Instance.new("TextButton", TopBar)
+UpBtn.Size = UDim2.new(0,60,1,0)
+UpBtn.Text = "⬆️"
+UpBtn.TextColor3 = Color3.fromRGB(255,255,255)
+UpBtn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+UpBtn.Font = Enum.Font.SourceSansBold
+UpBtn.TextSize = 18
+Instance.new("UICorner", UpBtn).CornerRadius = UDim.new(0,8)
 
-local ListFrame = Instance.new("ScrollingFrame")
-ListFrame.Size = UDim2.new(0.9, 0, 0, 110)
-ListFrame.Position = UDim2.new(0.05, 0, 0.8, 0)
+-- Tombol Turun
+local DownBtn = Instance.new("TextButton", TopBar)
+DownBtn.Size = UDim2.new(0,60,1,0)
+DownBtn.Text = "⬇️"
+DownBtn.TextColor3 = Color3.fromRGB(255,255,255)
+DownBtn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+DownBtn.Font = Enum.Font.SourceSansBold
+DownBtn.TextSize = 18
+Instance.new("UICorner", DownBtn).CornerRadius = UDim.new(0,8)
+
+-- Tombol Speed
+local SpeedBtn = Instance.new("TextButton", TopBar)
+SpeedBtn.Size = UDim2.new(0,100,1,0)
+SpeedBtn.Text = "⚡ Speed: 50"
+SpeedBtn.TextColor3 = Color3.fromRGB(255,255,255)
+SpeedBtn.BackgroundColor3 = Color3.fromRGB(80,80,80)
+SpeedBtn.Font = Enum.Font.SourceSansBold
+SpeedBtn.TextSize = 18
+Instance.new("UICorner", SpeedBtn).CornerRadius = UDim.new(0,8)
+
+-- Tele Player Btn
+local TeleBtn = Instance.new("TextButton", TopBar)
+TeleBtn.Size = UDim2.new(0,120,1,0)
+TeleBtn.Text = "👤 Teleport Player"
+TeleBtn.TextColor3 = Color3.fromRGB(255,255,255)
+TeleBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+TeleBtn.Font = Enum.Font.SourceSansBold
+TeleBtn.TextSize = 18
+Instance.new("UICorner", TeleBtn).CornerRadius = UDim.new(0,8)
+
+-- Tele CP Btn
+local CPBtn = Instance.new("TextButton", TopBar)
+CPBtn.Size = UDim2.new(0,120,1,0)
+CPBtn.Text = "📍 Teleport CP"
+CPBtn.TextColor3 = Color3.fromRGB(255,255,255)
+CPBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+CPBtn.Font = Enum.Font.SourceSansBold
+CPBtn.TextSize = 18
+Instance.new("UICorner", CPBtn).CornerRadius = UDim.new(0,8)
+
+-------------------- LIST PANEL (KE KANAN) --------------------
+local ListPanel = Instance.new("Frame", MainFrame)
+ListPanel.Size = UDim2.new(1,-20,1,-90)
+ListPanel.Position = UDim2.new(0,10,0,90)
+ListPanel.BackgroundColor3 = Color3.fromRGB(30,30,30)
+Instance.new("UICorner", ListPanel).CornerRadius = UDim.new(0,10)
+
+local ListFrame = Instance.new("ScrollingFrame", ListPanel)
+ListFrame.Size = UDim2.new(1,-10,1,-10)
+ListFrame.Position = UDim2.new(0,5,0,5)
 ListFrame.CanvasSize = UDim2.new(0,0,0,0)
-ListFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
-ListFrame.ScrollBarThickness = 4
-ListFrame.Visible = false
-ListFrame.Parent = Page1
-Instance.new("UICorner", ListFrame).CornerRadius = UDim.new(0, 6)
+ListFrame.BackgroundTransparency = 1
+ListFrame.ScrollBarThickness = 5
 
-local function refreshPlayers()
-    for _,child in pairs(ListFrame:GetChildren()) do
-        if child:IsA("TextButton") then child:Destroy() end
-    end
-    local y = 0
-    for _,plr in pairs(Players:GetPlayers()) do
-        if plr ~= LP then
-            local Btn = Instance.new("TextButton")
-            Btn.Size = UDim2.new(1, -5, 0, 30)
-            Btn.Position = UDim2.new(0, 0, 0, y)
-            Btn.Text = plr.Name
-            Btn.TextColor3 = Color3.fromRGB(255,255,255)
-            Btn.BackgroundColor3 = Color3.fromRGB(50,50,50)
-            Btn.Parent = ListFrame
-            y = y + 35
-            Btn.MouseButton1Click:Connect(function()
-                if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                    LP.Character:WaitForChild("HumanoidRootPart").CFrame = plr.Character.HumanoidRootPart.CFrame + Vector3.new(0,3,0)
-                end
-            end)
-        end
-    end
-    ListFrame.CanvasSize = UDim2.new(0,0,0,y)
+local UIList2 = Instance.new("UIListLayout", ListFrame)
+UIList2.FillDirection = Enum.FillDirection.Horizontal
+UIList2.SortOrder = Enum.SortOrder.LayoutOrder
+UIList2.Padding = UDim.new(0,8)
+
+for i=1,6 do
+    local Btn = Instance.new("TextButton", ListFrame)
+    Btn.Size = UDim2.new(0,120,0,40)
+    Btn.Text = "Item "..i
+    Btn.TextColor3 = Color3.fromRGB(255,255,255)
+    Btn.BackgroundColor3 = Color3.fromRGB(50,50,50)
+    Instance.new("UICorner", Btn).CornerRadius = UDim.new(0,8)
 end
-Players.PlayerAdded:Connect(refreshPlayers)
-Players.PlayerRemoving:Connect(refreshPlayers)
-refreshPlayers()
-DropDown.MouseButton1Click:Connect(function()
-    ListFrame.Visible = not ListFrame.Visible
-end)
 
--- Fly System
+-------------------- FLY SYSTEM --------------------
 local flying = false
-local speed = 60
-local bv
-local flyY = 0
+local speed = 50
 local upHeld, downHeld = false, false
-
-local function startFly()
-    local HRP = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
-    if not HRP then return end
-    bv = Instance.new("BodyVelocity")
-    bv.Velocity = Vector3.zero
-    bv.MaxForce = Vector3.new(1e5,1e5,1e5)
-    bv.Parent = HRP
-
-    RunService.RenderStepped:Connect(function()
-        if flying and HRP and bv then
-            local moveDir = LP.Character:FindFirstChild("Humanoid").MoveDirection
-            local vel = Vector3.new(moveDir.X*speed, flyY, moveDir.Z*speed)
-            bv.Velocity = vel
-        end
-    end)
-end
 
 FlyBtn.MouseButton1Click:Connect(function()
     flying = not flying
     FlyBtn.Text = flying and "✈️ Fly: ON" or "✈️ Fly: OFF"
-    flyY = 0
-    if flying then
-        startFly()
+end)
+
+SpeedBtn.MouseButton1Click:Connect(function()
+    if speed == 50 then
+        speed = 100
+    elseif speed == 100 then
+        speed = 150
     else
-        if bv then bv:Destroy() bv = nil end
+        speed = 50
     end
+    SpeedBtn.Text = "⚡ Speed: "..speed
 end)
 
--- ========================= PAGE 2: Checkpoint =========================
-local Checkpoints = {}
-local AutoTele = false
+UpBtn.MouseButton1Down:Connect(function() if flying then upHeld=true end end)
+UpBtn.MouseButton1Up:Connect(function() upHeld=false end)
+DownBtn.MouseButton1Down:Connect(function() if flying then downHeld=true end end)
+DownBtn.MouseButton1Up:Connect(function() downHeld=false end)
 
-local SaveBtn = Instance.new("TextButton")
-SaveBtn.Size = UDim2.new(0.9, 0, 0, 40)
-SaveBtn.Position = UDim2.new(0.05, 0, 0.05, 0)
-SaveBtn.Text = "💾 Save Checkpoint"
-SaveBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-SaveBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-SaveBtn.Font = Enum.Font.SourceSansBold
-SaveBtn.TextSize = 18
-SaveBtn.Parent = Page2
-Instance.new("UICorner", SaveBtn).CornerRadius = UDim.new(0, 6)
+RunService.RenderStepped:Connect(function()
+    if flying and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+        local HRP = LP.Character.HumanoidRootPart
+        local camCF = workspace.CurrentCamera.CFrame
+        local moveDir = Vector3.new(0,0,0)
 
-local DeleteBtn = Instance.new("TextButton")
-DeleteBtn.Size = UDim2.new(0.9, 0, 0, 40)
-DeleteBtn.Position = UDim2.new(0.05, 0, 0.2, 0)
-DeleteBtn.Text = "🗑️ Delete Last Checkpoint"
-DeleteBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-DeleteBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-DeleteBtn.Font = Enum.Font.SourceSansBold
-DeleteBtn.TextSize = 18
-DeleteBtn.Parent = Page2
-Instance.new("UICorner", DeleteBtn).CornerRadius = UDim.new(0, 6)
+        if UIS:IsKeyDown(Enum.KeyCode.W) then
+            moveDir = moveDir + camCF.LookVector
+        end
+        if UIS:IsKeyDown(Enum.KeyCode.S) then
+            moveDir = moveDir - camCF.LookVector
+        end
+        if UIS:IsKeyDown(Enum.KeyCode.A) then
+            moveDir = moveDir - camCF.RightVector
+        end
+        if UIS:IsKeyDown(Enum.KeyCode.D) then
+            moveDir = moveDir + camCF.RightVector
+        end
+        if upHeld then
+            moveDir = moveDir + Vector3.new(0,1,0)
+        end
+        if downHeld then
+            moveDir = moveDir + Vector3.new(0,-1,0)
+        end
 
-local AutoTeleBtn = Instance.new("TextButton")
-AutoTeleBtn.Size = UDim2.new(0.9, 0, 0, 40)
-AutoTeleBtn.Position = UDim2.new(0.05, 0, 0.35, 0)
-AutoTeleBtn.Text = "⚡ Auto Teleport: OFF"
-AutoTeleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-AutoTeleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-AutoTeleBtn.Font = Enum.Font.SourceSansBold
-AutoTeleBtn.TextSize = 18
-AutoTeleBtn.Parent = Page2
-Instance.new("UICorner", AutoTeleBtn).CornerRadius = UDim.new(0, 6)
-
-SaveBtn.MouseButton1Click:Connect(function()
-    local HRP = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
-    if HRP then
-        table.insert(Checkpoints, HRP.CFrame)
-        print("Checkpoint saved:", #Checkpoints)
-    end
-end)
-
-DeleteBtn.MouseButton1Click:Connect(function()
-    if #Checkpoints > 0 then
-        table.remove(Checkpoints)
-        print("Last checkpoint deleted. Total:", #Checkpoints)
-    end
-end)
-
-AutoTeleBtn.MouseButton1Click:Connect(function()
-    AutoTele = not AutoTele
-    AutoTeleBtn.Text = AutoTele and "⚡ Auto Teleport: ON" or "⚡ Auto Teleport: OFF"
-    if AutoTele then
-        coroutine.wrap(function()
-            while AutoTele do
-                for _,cf in ipairs(Checkpoints) do
-                    if not AutoTele then break end
-                    if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
-                        LP.Character.HumanoidRootPart.CFrame = cf + Vector3.new(0,3,0)
-                        task.wait(1)
-                    end
-                end
-            end
-        end)()
+        if moveDir.Magnitude > 0 then
+            HRP.Velocity = moveDir.Unit * speed
+        else
+            HRP.Velocity = Vector3.new(0,0,0)
+        end
     end
 end)
